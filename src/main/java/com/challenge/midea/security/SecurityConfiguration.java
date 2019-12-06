@@ -4,14 +4,19 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.challenge.midea.filters.JwtRequestFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
@@ -19,9 +24,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 //	@Autowired
 //	DataSource dataSource;
 	
-//	@Autowired
-//	UserDetailsService userDetailsService;
+	@Autowired
+	UserDetailsService userDetailsService;
+	@Autowired
+	JwtRequestFilter jwtRequestFilter;
 	
+	@Override
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
+		//Set your configurations on the auth object
+		
+		//for JDBC + JPA Authentication using UserDetailsService (preferred)
+		auth.userDetailsService(userDetailsService);
+	}
+	
+	/*
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		//Set your configurations on the auth object
@@ -36,15 +52,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 			.passwordCompare()
 			.passwordEncoder(new LdapShaPasswordEncoder())
 			.passwordAttribute("userPassword");
-	}
-
-	/*
-	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		//Set your configurations on the auth object
-		
-		//for JDBC + JPA Authentication using UserDetailsService (preferred)
-		auth.userDetailsService(userDetailsService);
 	}
 	*/
 	
@@ -85,6 +92,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	}
 	*/
 	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable()
+			.authorizeRequests().antMatchers("/authenticate").permitAll()
+			.anyRequest().authenticated()
+			.and()
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+	}
+	
 	/*
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -96,6 +113,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	}
 	*/
 	
+	/*
 	// Authorization Implementation - Only for LDAP
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -105,9 +123,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 			.and()
 			.formLogin();
 	}
+	*/
 	
-//	@Bean
-//	public PasswordEncoder getPasswordEncoder() {
-//		return NoOpPasswordEncoder.getInstance();
-//	}
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	@Bean
+	public PasswordEncoder getPasswordEncoder() {
+		return NoOpPasswordEncoder.getInstance();
+	}
 }
