@@ -19,13 +19,14 @@ import com.challenge.midea.util.JWTUtil;
 @RestController
 public class MideaController {
 	
-	@Autowired
-	AuthenticationManager authenticationManager;
+//	@Autowired
+//	AuthenticationManager authenticationManager;
 	@Autowired
 	UserDetailsService userDetailsService;
 	@Autowired
 	JWTUtil jwtUtil;
 	
+	/*
 	@PostMapping("/authenticate")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 		try {
@@ -43,7 +44,7 @@ public class MideaController {
 		final String jwt = jwtUtil.generateToken(userDetails);
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
-
+	 */
 	@GetMapping("/")
 	public String getHomeContent() {
 		return ("<h1>WELCOME to mIDEA</h1>");

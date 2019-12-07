@@ -1,0 +1,33 @@
+server:
+    port: 7777
+spring:
+    datasource:
+        driver-class-name: com.mysql.jdbc.Driver
+        password: root
+        url: jdbc:mysql://localhost:3306/midea
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL5Dialect
+    ldap:
+        embedded:
+            base-dn: 'dc=springframework,dc=org '
+            ldif: 'classpath:ldap-data.ldif '
+            port: 8389.0
+            url: ldap://localhost:8389/
+security:
+  oauth2:
+    client:
+      clientId: 8088506a54e815bfd385
+      clientSecret: b176e799d311adfdf3b21f90a4fc22c7fe83de4c
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
